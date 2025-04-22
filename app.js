@@ -1,21 +1,17 @@
 // Abstract API service (Dependency Inversion Principle)
 const airQualityService = {
     async getAirQuality(lat, lon) {
-        const apiKey = "b61bd157-7f56-422a-bea6-5b8db55dfb7f";
-        const url = `https://api.airvisual.com/v2/nearest_city?lat=${lat}&lon=${lon}&key=${apiKey}`;
+        const apiKey = "df5c6553925d29ccf14abf65c90f7402"; // Replace with your OpenWeatherMap key
+        const url = `http://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${apiKey}`;
         const response = await fetch(url);
         if (!response.ok) {
-            const errorData = await response.json();
-            if (errorData.data?.message === "city_not_found") {
-                throw new Error("No air quality data available for this location.");
-            }
-            throw new Error(`HTTP error! Status: ${response.status}, Message: ${JSON.stringify(errorData)}`);
+            throw new Error(`HTTP error! Status: ${response.status}, Message: ${await response.text()}`);
         }
         const data = await response.json();
-        if (!data.data?.current?.pollution?.aqius) {
+        if (!data.list?.[0]?.main?.aqi) {
             throw new Error("AQI data not found in response");
         }
-        return data.data.current.pollution.aqius;
+        return data.list[0].main.aqi; // AQI on a scale of 1–5
     }
 };
 
@@ -37,10 +33,10 @@ function getUserLocation() {
 
 // Function to map AQI to a health recommendation (Single Responsibility Principle)
 function getRecommendation(aqi) {
-    if (aqi <= 50) return "Good: Safe for all activities.";
-    if (aqi <= 100) return "Moderate: Fine for most, but sensitive groups should be cautious.";
-    if (aqi <= 150) return "Unhealthy for Sensitive Groups: Limit outdoor activities.";
-    if (aqi <= 200) return "Unhealthy: Avoid prolonged outdoor activities.";
+    if (aqi === 1) return "Good: Safe for all activities.";
+    if (aqi === 2) return "Moderate: Fine for most, but sensitive groups should be cautious.";
+    if (aqi === 3) return "Unhealthy for Sensitive Groups: Limit outdoor activities.";
+    if (aqi === 4) return "Unhealthy: Avoid prolonged outdoor activities.";
     return "Hazardous: Stay indoors.";
 }
 
@@ -72,7 +68,7 @@ document.getElementById("check-air-quality").addEventListener("click", async () 
         // Update UI
         updateUI({ lat, lon, aqi, recommendation });
     } catch (error) {
-        if (error.message.includes("No air quality data available")) {
+        if (error.message.includes("AQI data not found")) {
             document.getElementById("fallback").style.display = "block";
         } else {
             alert(`Error: ${error.message}`);

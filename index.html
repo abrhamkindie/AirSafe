@@ -9,7 +9,12 @@
 <body>
     <div class="container">
         <h1>AirSafe: Real-Time Air Quality Monitor</h1>
-        <button id="check-air-quality">Check Air Quality</button>
+        <div>
+            <button id="check-air-quality">Check Air Quality (Current Location)</button>
+            <p>OR</p>
+            <input type="text" id="city-input" placeholder="Enter city (e.g., New York)">
+            <button id="check-city-air-quality">Check Air Quality for City</button>
+        </div>
         <div id="result">
             <p id="location">Location: Waiting...</p>
             <p id="aqi">AQI: Not checked yet</p>
