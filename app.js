@@ -1,12 +1,12 @@
 // Abstract API service (Dependency Inversion Principle)
 const airQualityService = {
     async getAirQuality(lat, lon) {
-        const apiKey = "b61bd157-7f56-422a-bea6-5b8db55dfb7f"; // Replace with your IQAir API key
-        const url = `https://api.iqair.com/api/v1/air-quality/nearest-city?lat=${lat}&lon=${lon}&key=${apiKey}`;
-         const response = await fetch(url);
+        const apiKey = "b61bd157-7f56-422a-bea6-5b8db55dfb7f";
+        const url = `https://api.airvisual.com/v2/nearest_city?lat=${lat}&lon=${lon}&key=${apiKey}`;
+        const response = await fetch(url);
         if (!response.ok) throw new Error("Failed to fetch air quality data");
         const data = await response.json();
-        return data.data.current.pollution.aqius; // AQI (US standard)
+        return data.data.current.pollution.aqius; // Adjust if the response structure has changed
     }
 };
 
