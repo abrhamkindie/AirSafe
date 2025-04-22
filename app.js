@@ -3,10 +3,20 @@ const airQualityService = {
     async getAirQuality(lat, lon) {
         const apiKey = "b61bd157-7f56-422a-bea6-5b8db55dfb7f";
         const url = `https://api.airvisual.com/v2/nearest_city?lat=${lat}&lon=${lon}&key=${apiKey}`;
-        const response = await fetch(url);
-        if (!response.ok) throw new Error("Failed to fetch air quality data");
-        const data = await response.json();
-        return data.data.current.pollution.aqius; // Adjust if the response structure has changed
+        try {
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}, Message: ${await response.text()}`);
+            }
+            const data = await response.json();
+            console.log("API Response:", data); // Debug the response
+            if (!data.data?.current?.pollution?.aqius) {
+                throw new Error("AQI data not found in response");
+            }
+            return data.data.current.pollution.aqius;
+        } catch (error) {
+            throw new Error(`Failed to fetch air quality data: ${error.message}`);
+        }
     }
 };
 
