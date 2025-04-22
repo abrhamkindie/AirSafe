@@ -2,13 +2,16 @@
 const airQualityService = {
     async getAirQuality(lat, lon) {
         const apiKey = "b61bd157-7f56-422a-bea6-5b8db55dfb7f";
-        const url = `https://api.airvisual.com/v2/nearest_city?lat=40.7128&lon=-74.0060&key=${apiKey}`;
+        const url = `https://api.airvisual.com/v2/nearest_city?lat=${lat}&lon=${lon}&key=${apiKey}`;
         const response = await fetch(url);
         if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}, Message: ${await response.text()}`);
+            const errorData = await response.json();
+            if (errorData.data?.message === "city_not_found") {
+                throw new Error("No air quality data available for this location.");
+            }
+            throw new Error(`HTTP error! Status: ${response.status}, Message: ${JSON.stringify(errorData)}`);
         }
         const data = await response.json();
-        console.log("API Response:", data); // Debug the response
         if (!data.data?.current?.pollution?.aqius) {
             throw new Error("AQI data not found in response");
         }
@@ -51,6 +54,12 @@ function updateUI({ lat, lon, aqi, recommendation }) {
 // Main logic to tie it all together
 document.getElementById("check-air-quality").addEventListener("click", async () => {
     try {
+        // Reset UI
+        document.getElementById("fallback").style.display = "none";
+        document.getElementById("location").textContent = "Location: Waiting...";
+        document.getElementById("aqi").textContent = "AQI: Not checked yet";
+        document.getElementById("recommendation").textContent = "Recommendation: Not available";
+
         // Get user location
         const { lat, lon } = await getUserLocation();
         
@@ -63,6 +72,10 @@ document.getElementById("check-air-quality").addEventListener("click", async () 
         // Update UI
         updateUI({ lat, lon, aqi, recommendation });
     } catch (error) {
-        alert(`Error: ${error.message}`);
+        if (error.message.includes("No air quality data available")) {
+            document.getElementById("fallback").style.display = "block";
+        } else {
+            alert(`Error: ${error.message}`);
+        }
     }
 });
