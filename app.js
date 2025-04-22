@@ -1,7 +1,7 @@
 // Abstract API service (Dependency Inversion Principle)
 const airQualityService = {
     async getAirQuality(lat, lon) {
-        const url = `/.netlify/functions/get-air-quality?lat=${lat}&lon=${lon}`;
+        const url = `/api/get-air-quality?lat=${lat}&lon=${lon}`;
         const response = await fetch(url);
         if (!response.ok) {
             const errorData = await response.json();
@@ -14,7 +14,7 @@ const airQualityService = {
         return data.list[0].main.aqi;
     },
     async getCoordinatesByCity(city) {
-        const url = `/.netlify/functions/get-coordinates?city=${encodeURIComponent(city)}`;
+        const url = `/api/get-coordinates?city=${encodeURIComponent(city)}`;
         const response = await fetch(url);
         if (!response.ok) {
             const errorData = await response.json();

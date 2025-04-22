@@ -1,0 +1,17 @@
+{
+  "name": "airsafe",
+  "version": "1.0.0",
+  "description": "Real-time Air Quality Monitor",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vercel dev",
+    "start": "vercel start",
+    "build": "vercel build"
+  },
+  "dependencies": {
+    "node-fetch": "^2.6.7"
+  },
+  "devDependencies": {
+    "vercel": "^28.16.11"
+  }
+} 
